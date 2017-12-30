@@ -30,32 +30,59 @@ def find_dictionary(ctgC):
 		return outfielderD
 
 
-driver = webdriver.Chrome(os.environ['chrome_driver_loc'])
+# driver = webdriver.Chrome(os.environ['chrome_driver_loc'])
+driver = webdriver.PhantomJS(os.environ['phantomjs_loc'])
 driver.get("https://www.koreabaseball.com/Player/RegisterAll.aspx")
-try :
-	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "cphContents_cphContents_cphContents_btnPreDate")))			
-except TimeoutException :
-	print("Time out!!!")
 
-date = driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value")
-print(date)
-
-# 이전 날짜로
-driver.find_element_by_id("cphContents_cphContents_cphContents_btnPreDate").click()
-
+# 대기 - 팀 목록
 try :
 	WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CLASS_NAME, "fir")))
 except TimeoutException :
 	print("Time out!!!")
-
-# 곧 없어질것들
-# html = driver.page_source
-# bsObj = BeautifulSoup(html, "html.parser")
-
+# 팀 목록
 teams = driver.find_elements_by_class_name("fir")
 for team in teams :
 	teamSet.append(team.text)
 print(teamSet)
+
+
+# 현재 날짜
+date = driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value")
+ctgC = 0
+teamC = 0
+all_info = driver.find_element_by_tag_name("tbody").find_elements_by_tag_name("td")
+for info in all_info :
+	dic = find_dictionary(ctgC)
+	tmpL = []
+
+	for i in range(0, len(info.find_elements_by_tag_name("li"))) :
+		tmpL.append(info.find_elements_by_tag_name("li")[i].text)
+		dic[teamC] = tmpL
+
+	if info.get_attribute("class") == "last" :
+		teamC += 1
+
+	ctgC = ctgC + 1 if (ctgC != 5) else 0
+print(date)
+for i in range(0, len(teamSet)) :
+	print(teamSet[i])
+	print(managerD[i])
+	print(coachD[i])
+	print(pitcherD[i])
+	print(catcherD[i])
+	print(infielderD[i])
+	print(outfielderD[i])
+	print("----------")
+
+
+# 대기 - 날짜 이동버튼 클릭가능까지
+try :
+	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "cphContents_cphContents_cphContents_btnPreDate")))			
+except TimeoutException :
+	print("Time out!!!")
+# 이전 날짜로
+driver.find_element_by_id("cphContents_cphContents_cphContents_btnPreDate").click()
+
 
 date = default_date
 # 요일을 locator로 잡기. call시 in으로 검사해서 가능
@@ -68,29 +95,5 @@ except TimeoutException :
 date = driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value")
 print(date)
 
-# ctgC = 0
-# teamC = 0
-# infos = bsObj.find("tbody").find_all("td")
-# for info in infos :
-# 	dic = find_dictionary(ctgC)
-# 	tmpL = []
 
-# 	for i in range(0, len(info.find_all("li"))) :
-# 		tmpL.append(info.find_all("li")[i].get_text())
-# 		dic[teamC] = tmpL
-
-# 	if "class" in info.attrs :
-# 		teamC += 1
-		
-# 	ctgC = ctgC + 1 if (ctgC != 5) else 0
-
-# print(date)
-# for i in range(0, len(teamSet)) :
-# 	print(teamSet[i])
-# 	print(managerD[i])
-# 	print(coachD[i])
-# 	print(pitcherD[i])
-# 	print(catcherD[i])
-# 	print(infielderD[i])
-# 	print(outfielderD[i])
-# 	print("----------")
+driver.close()
