@@ -1,12 +1,13 @@
-from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import os
+import json
 
-default_date = "20171003"
+day_of_week = ['화','월','일','토','금','목','수']
+
 teamSet = []
 managerD = {}
 coachD = {}
@@ -43,57 +44,62 @@ except TimeoutException :
 teams = driver.find_elements_by_class_name("fir")
 for team in teams :
 	teamSet.append(team.text)
-print(teamSet)
 
 
-# 현재 날짜
-date = driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value")
-ctgC = 0
-teamC = 0
-all_info = driver.find_element_by_tag_name("tbody").find_elements_by_tag_name("td")
-for info in all_info :
-	dic = find_dictionary(ctgC)
-	tmpL = []
+day_checker = 0
+# 언제까지로 할지?????
+while True :
+	# 요일을 locator로 잡기. call시 in으로 검사해서 가능
+	try :
+		WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.ID, "cphContents_cphContents_cphContents_lblGameDate"), day_of_week[day_checker]))
+	except TimeoutException :
+		print("Time out!!!")
 
-	for i in range(0, len(info.find_elements_by_tag_name("li"))) :
-		tmpL.append(info.find_elements_by_tag_name("li")[i].text)
-		dic[teamC] = tmpL
+	# 현재 날짜
+	date = driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value")
+	print(date)
 
-	if info.get_attribute("class") == "last" :
-		teamC += 1
+	ctgC = 0
+	teamC = 0
+	all_info = driver.find_element_by_tag_name("tbody").find_elements_by_tag_name("td")
+	for info in all_info :
+		dic = find_dictionary(ctgC)
+		tmpL = []
 
-	ctgC = ctgC + 1 if (ctgC != 5) else 0
-print(date)
-for i in range(0, len(teamSet)) :
-	print(teamSet[i])
-	print(managerD[i])
-	print(coachD[i])
-	print(pitcherD[i])
-	print(catcherD[i])
-	print(infielderD[i])
-	print(outfielderD[i])
-	print("----------")
+		for i in range(0, len(info.find_elements_by_tag_name("li"))) :
+			tmpL.append(info.find_elements_by_tag_name("li")[i].text)
+			dic[teamC] = tmpL
 
+		if info.get_attribute("class") == "last" :
+			teamC += 1
 
-# 대기 - 날짜 이동버튼 클릭가능까지
-try :
-	WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "cphContents_cphContents_cphContents_btnPreDate")))			
-except TimeoutException :
-	print("Time out!!!")
-# 이전 날짜로
-driver.find_element_by_id("cphContents_cphContents_cphContents_btnPreDate").click()
+		ctgC = ctgC + 1 if (ctgC != 5) else 0
 
+	# to JSON	
+	for i in range(0, len(teamSet)) :
+		for_json = {}
+		for_json['date'] = date
+		for_json['team'] = teamSet[i]
+		for_json['manager'] = managerD[i]	
+		for_json['coach'] = coachD[i]
+		for_json['pitcher'] = pitcherD[i]
+		for_json['catcher'] = catcherD[i]
+		for_json['infielder'] = infielderD[i]
+		for_json['outfielder'] = outfielderD[i]
+		json_val = json.dumps(for_json, ensure_ascii=False)
+		# print(json_val)
+		# print("----------")
 
-date = default_date
-# 요일을 locator로 잡기. call시 in으로 검사해서 가능
-try :
-	WebDriverWait(driver, 10).until(EC.text_to_be_present_in_element((By.ID, "cphContents_cphContents_cphContents_lblGameDate"), "월"))
-except TimeoutException :
-	print("Time out!!!")
-# while date == driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value") :
-# 	driver.implicitly_wait(10)
-date = driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value")
-print(date)
+	# 대기 - 날짜 이동버튼 클릭가능까지
+	try :
+		WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "cphContents_cphContents_cphContents_btnPreDate")))			
+	except TimeoutException :
+		print("Time out!!!")
 
+	# 이전 날짜로
+	driver.find_element_by_id("cphContents_cphContents_cphContents_btnPreDate").click()
+
+	# 요일(locator) 변환
+	day_checker = day_checker + 1 if (day_checker != 6) else 0
 
 driver.close()
