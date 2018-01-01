@@ -4,7 +4,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 import os
-import json
+from pymongo import MongoClient
+
+client = MongoClient(os.environ['kbo_mlab_uri'])
+db = client.kbo
+erm = db.erm
 
 day_of_week = ['화','월','일','토','금','목','수']
 
@@ -30,8 +34,6 @@ def find_dictionary(ctgC):
 	else :
 		return outfielderD
 
-
-# driver = webdriver.Chrome(os.environ['chrome_driver_loc'])
 driver = webdriver.PhantomJS(os.environ['phantomjs_loc'])
 driver.get("https://www.koreabaseball.com/Player/RegisterAll.aspx")
 
@@ -47,7 +49,6 @@ for team in teams :
 
 
 day_checker = 0
-# 언제까지로 할지?????
 while True :
 	# 요일을 locator로 잡기. call시 in으로 검사해서 가능
 	try :
@@ -57,6 +58,9 @@ while True :
 
 	# 현재 날짜
 	date = driver.find_element_by_id("cphContents_cphContents_cphContents_hfSearchDate").get_attribute("value")
+	# breakpoint : 2017 시즌 시작일
+	if (date == "20170330") :
+		break;
 	print(date)
 
 	ctgC = 0
@@ -75,7 +79,6 @@ while True :
 
 		ctgC = ctgC + 1 if (ctgC != 5) else 0
 
-	# to JSON	
 	for i in range(0, len(teamSet)) :
 		for_json = {}
 		for_json['date'] = date
@@ -86,9 +89,8 @@ while True :
 		for_json['catcher'] = catcherD[i]
 		for_json['infielder'] = infielderD[i]
 		for_json['outfielder'] = outfielderD[i]
-		json_val = json.dumps(for_json, ensure_ascii=False)
-		# print(json_val)
-		# print("----------")
+		# save to db
+		erm.insert(for_json)
 
 	# 대기 - 날짜 이동버튼 클릭가능까지
 	try :
