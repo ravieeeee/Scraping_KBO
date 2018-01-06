@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import request
 from flask_pymongo import PyMongo
 from jinja2 import Environment, FileSystemLoader
 import os
@@ -14,8 +15,13 @@ env = Environment(loader=FileSystemLoader('templates'))
 def index_page():
 	return env.get_template('index.html').render()
 
-@app.route('/search/<date>')
-def search_page(date):
-	bson_result = mongo.db.erm.find_one_or_404({'date': date})
+@app.route('/search')
+def search_page():
+	date = request.args.get('date')
+	team = request.args.get('team')
+	bson_result = mongo.db.erm.find({'date': date, 'team': team}, {'_id': False})
 	result = dumps(bson_result, ensure_ascii=False)
-	return env.get_template('result.html').render(result=result)
+	return env.get_template('search.html').render(result=result)
+
+if __name__ == '__main__':
+    app.run()
