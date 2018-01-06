@@ -24,4 +24,4 @@ def search_page():
 	return env.get_template('search.html').render(result=result)
 
 if __name__ == '__main__':
-    app.run()
+	app.run()
