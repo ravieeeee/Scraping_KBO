@@ -83,7 +83,7 @@ while True :
 		for_json = {}
 		for_json['date'] = date
 		for_json['team'] = teamSet[i]
-		for_json['manager'] = managerD[i]	
+		for_json['manager'] = managerD[i]
 		for_json['coach'] = coachD[i]
 		for_json['pitcher'] = pitcherD[i]
 		for_json['catcher'] = catcherD[i]
@@ -94,7 +94,7 @@ while True :
 
 	# 대기 - 날짜 이동버튼 클릭가능까지
 	try :
-		WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "cphContents_cphContents_cphContents_btnPreDate")))			
+		WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "cphContents_cphContents_cphContents_btnPreDate")))
 	except TimeoutException :
 		print("Time out!!!")
 

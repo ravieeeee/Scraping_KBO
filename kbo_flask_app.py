@@ -1,21 +1,25 @@
 from flask import Flask
 from flask import request
 from flask_pymongo import PyMongo
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 import os
-import bson
 from bson.json_util import dumps
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = os.environ['kbo_mlab_uri']
 mongo = PyMongo(app)
-env = Environment(loader=FileSystemLoader('templates'))
+env = Environment(
+	loader=FileSystemLoader('templates'),
+	autoescape=select_autoescape('html')
+)
 
 def teamname_case_insensitive(team):
 	if team == 'KT':
 		return 'kt'
 	elif team != 'kt':
 		return team.upper()
+	else:
+		return team
 
 @app.route('/')
 def index_page():

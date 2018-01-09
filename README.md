@@ -18,7 +18,7 @@ robots.txt상 allowed에서 진행했습니다.
 
 **Request URL**
 
-* http://www.kbo.space/search?date={request\_date}&team={team\_name}
+* http://www.kbo.space/search?date={request_date}&team={team_name}
 
 **Request Parameter**
 
@@ -41,6 +41,7 @@ team(case insensitive)
 | KT        | KT Wiz(KT 위즈)              |
 
 **Response**
+
 JSON
 * date : 날짜
 * team : 팀명
