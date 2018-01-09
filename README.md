@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0deba11f591a4d14b234a3f24b87f433)](https://www.codacy.com/app/ravieeeee/Scraping_KBO?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ravieeeee/Scraping_KBO&amp;utm_campaign=Badge_Grade)
+
 robots.txt상 allowed에서 진행했습니다.
 
 문제가 있으면 issue로 알려주세요.
