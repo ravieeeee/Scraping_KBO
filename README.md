@@ -44,14 +44,12 @@ team(case insensitive)
 
 **Response**
 
-JSON
-* date : 날짜
-* team : 팀명
-* manager : 감독
-* coach : 코치
-* pitcher : 투수
-* catcher : 포수
-* infielder : 내야수
-* outfielder : 외야수
+* date
+* team
+* manager
+* coach
+* pitcher
+* catcher
+* infielder
+* outfielder
 
-XML
